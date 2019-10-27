@@ -1,144 +1,101 @@
-create table Department
-(
-dname varchar(20) Primary key,
-location varchar(15),
-budget numeric(19,3)
-)
+select * from course;
+select * from department
 
-create table Instructor
-(
-id integer primary key,
-iname varchar(20),
-designation varchar(25),
-salary numeric(9,2),
-depname varchar(10),
-foreign key(depname) references Department
-)
+select * from student;
+select * from instructor;
+select * from teach;
+select * from section;
+select * from take;
+insert into department(depname,location,budget)
+values('CS and AI','Block A',1500000),('Electronics','Block B',125000),
+('Physics','Block A',200000),('Mathematics','Block B',250000);
 
-create table Course
-(
-ccode varchar(5) primary key,
-ctitle varchar(15),
-credits integer,
-depname varchar(10),
-foreign key(depname) references Department
-)
+insert into course(ccode,ctitle,credits,depname)
+values('CS100','Data Structures',4,'CS and AI'),
+('MAT01','Linear Algebra',4,'Mathematics'),
+('MAT02','Discrete Math',3,'Mathematics'),
+('CS101','Algorithms',4,'CS and AI'),
+('CS102','OS',4,'CS and AI'),
+('EC101','Chip Design',4,'Electronics'),
+('EC102','EM Waves',4,'Electronics');
 
-create table Section
-(
-section_id varchar(5),
-ccode varchar(15),
-sem varchar(2),
-year integer,
-romm_no integer,
-foreign key(ccode) references Course,
-Primary key(section_id,ccode,sem,year)
-)
+insert into instructor(id,iname,designation,salary,depname)
+values('123','Dr.Ramesh','AProfessor',100000,'CS and AI'),
+('125','Dr.Gopi','AProfessor',124000,'CS and AI'),
+('124','Dr.Suresh','AProfessor',120000,'Mathematics'),
+('126','Dr.Ghatak','Professor',145000,'Mathematics'),
+('127','Maya','Professor',150000,'Electronics'),
+('128','Ashwarya','TA',125000,'Electronics');
 
-create table Teach
-(
-id integer,
-section_id varchar(5),
-ccode varchar(15),
-sem varchar(2),
-year integer,
-foreign key(id) references Instructor,
-foreign key(section_id,ccode,sem,year) references Section,
-Primary key(id,section_id,ccode,sem,year)
-)
+insert into section(section_id,ccode,sem,year,room_no)
+values('101','CS100',4,2005,130),
+('102','MAT01',3,2005,131),
+('103','CS101',2,2005,132),
+('104','CS102',3,2005,133),
+('106','EC101',4,2005,135),
+('107','EC102',5,2006,136),
+('108','MAT02',6,2007,137);
 
-create table Student
-(
-sid integer primary key,
-sname varchar(25),
-date_of_birth date,
-depname varchar(10),
-foreign key(depname) references Department
-)
+insert into teach(id,section_id,ccode,sem,year)
+values('123','103','CS101',2,2005),
+('124','102','MAT01',3,2005);
 
-create table Take
-(
-sid integer,
-section_id varchar(5),
-ccode varchar(15),
-sem varchar(2),
-year integer,
-grade varchar(2),
-foreign key(section_id,ccode,sem,year) references Section,
-foreign key(sid) references Student,
-Primary key(sid,section_id,ccode,sem,year)
-)
-insert into Instructor values('1','Ray Blackwell','Professor',65000,'csc');
-insert into Instructor values('2','Orange tsai','Professor',65000,'goerge');
-insert into Instructor values('3','Mary klutz','Professor',75000,'lolan');
-insert into Instructor values('4','Kevin Mitnick','Professor',60000,'english');
-insert into Instructor values('5','Bronson Mitchell','Professor',60000,'maths');
-insert into Instructor values('6','Ananya Bansal','Professor',65000,'goerge');
-insert into Instructor values('7','Nova everlan','Professor',65000,'maths');
-insert into Instructor values('8','Aira Harune','Professor',65000,'csc');
+insert into student(sid,sname,date_of_birth,depname)
+values('0000','Rahul','1999-11-02','CS and AI'),
+('0001','Rohan','1999-05-03','CS and AI'),
+('0002','Anandhu','1999-04-02','Mathematics'),
+('0003','Laxman','1998-03-03','Electronics'),
+('0004','Kumble','1997-02-02','CS and AI'),
+('0005','Dravid','1999-05-30','Mathematics');
 
-insert into Course values('cs103','Intro to comp',3,'csc');
-insert into Course values('cs206','ML',3,'csc');
-insert into Course values('en103','Advanced eng',3,'english');
-insert into Course values('ma101','Li Algebra',4,'maths');
-insert into Course values('ge201','Geography',2,'goerge');
-insert into Course values('os201','os',2,'csc');
+insert into take(sid,section_id,ccode,sem,year,grade)
+values('0000','101','CS100',4,2005,'A+'),
+('0001','102','MAT01',3,2005,'O'),
+('0003','106','EC101',4,2005,'A'),
+('0004','108','MAT02',6,2007,'O');
 
+/*1 Fetch iname from instructor and ccode from teach,where instructor.id=teach.id*/
+select iname,ccode from instructor,teach where instructor.id=teach.id;
 
+/*2 Return a table having iname,ccode, where equality of common colomns are evaluated,if not normal cross product */
+select iname,ccode from instructor natural join teach;
 
-insert into Section values('101','cs103','s1',2018,1);
-insert into Section values('102','cs103','s1',2018,2);
-insert into Section values('101','en103','s2',2018,3);
-insert into Section values('104','ge201','s1',2018,4);
-insert into Section values('104','os201','s1',2018,4);
+/*3 Same as above,except that table name where iname,ccode to be fetched using dot operation*/
+select instructor.iname, teach.ccode from instructor natural join teach;
 
+/*4 Rows where sid ins student and sid in take  merged,hence sid is repeated*/
+select * from student join take on student.sid=take.sid;
 
-insert into Teach values(1,'101','cs103','s1',2018);
-insert into Teach values(3,'101','cs103','s1',2018);
-insert into Teach values(4,'101','en103','s2',2018);
-insert into Teach values(6,'104','ge201','s1',2018);
-insert into Teach values(1,'104','os201','s1',2018);
+/*5 Select entire rows from both tables, where students.sid=take.sid*/
+select * from student,take where student.sid=take.sid;
 
+/*6 display sid,sname,depname,ccode,section_id,sem,year,grade from join of student and take where sid in students equals sid in take */
+select student.sid as ID, sname, depname,ccode, section_id, sem, year, grade
+from student join take on student.sid= take.sid;
 
-insert into student values(256,'Adam','6-5-1999','csc');
-insert into student values(257,'Johnson','6-25-1999','english');
-insert into student values(258,'Vlad','6-9-1999','goerge');
-insert into student values(259,'Ren Hitoshi','4-19-1999','maths');
+/*7 Add a record in teach table where an instructor teaches a course belonging to another department and not his department.
+Making professor with id (124) who is from math department to teach a CS course*/
+insert into teach(id,section_id,ccode,sem,year)
+values('124','101','CS100',4,2005);
 
-insert into take values(256,101,'cs103','s1',2018,'A+');
-insert into take values(257,101,'en103','s2',2018,'A+');
-insert into take values(258,104,'ge201','s1',2018,'A');
+/*8 display name and designation of professor from join of teach,course,and instructor,where teach.ccode=course.ccode,
+inturn display about people who are teaching a course currently*/
+select iname,designation from instructor natural join teach,course where teach.ccode=course.ccode;
 
+/*9 fetch name and designation where common columns  have same value from tables instructor,
+teach and course.*/
+select iname,designation from instructor natural join teach natural join course;
 
+/*10 Here natural join table is made using instructor and teach , and join with course is made using
+ccode,ie you are specifiying the attribute on its basis the join has to be done*/
+select iname,designation from (instructor natural join teach) join course using(ccode);
 
+/*11 Already,two anandhu and dravid have not taken any courses, people included in student 
+as well as take as well*/
+select  * from student natural left outer join take;
 
-select iname,location from Instructor,Department where Department.dname=Instructor.depname;
-select iname, ctitle from Instructor natural join Teach, Course where Teach.ccode= Course.ccode;
+/*12 only in student and entry is not in take hence their ccode will be null*/
+select sid from student natural left outer join take where ccode is null;
 
-alter table Instructor add column gender varchar(2);
-update Instructor set gender='M';
-update Instructor set gender='F' where id=6;
-update Instructor set gender='F' where id=7;
-update Instructor set gender='F' where id=8;
-
-select iname,ctitle,Teach.ccode from Instructor natural join Teach,Course where Teach.ccode=Course.ccode and Instructor.gender='F';
-
-select ctitle, budget from Course,Department where Department.dname=Course.depname;
-
-select iname from Instructor natural join Teach,Course where Course.ctitle='os' and Course.ccode=Teach.ccode and Teach.id=Instructor.id;
-
-select iname, Teach.ccode from Instructor natural join Teach where Instructor.id = teach.id and Teach.year=2016;
-
-select iname from Instructor natural join Teach where Teach.id=Instructor.id and Instructor.depname='cs' and Teach.year=2016;
-
-select sname from student natural join take,Course where student.sid=take.sid and take.ccode=Course.ccode and Course.title='dbms' and take.grade='A';
-
-select sid from take natural join Course where take.id=Course.id and Course.ctitle='dbms';
-
-select id,count(ccode) from Teach group by id;
-
-select id,count(ccode) from Teach group by id where year=2017;
-
-select iname from Instructor natural join Department where Instructor.depname=Department.dname and department.location='Main';
-
-select iname form Instructor natural join Teach,Course where Instructor.id=Teach.id and Teach.sem=2 and Instructor.depname='cs' and Teach.ccode=Course.ccode and Course.ctitle='c programming';
+/*13 entries in join, only present in table take*/
+select * from take natural right outer join student;
